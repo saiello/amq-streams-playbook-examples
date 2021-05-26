@@ -1,0 +1,6 @@
+.idea
+.vagrant
+
+*/certs/*
+!*/certs/Makefile
+!*/certs/openssl-ca.cnf

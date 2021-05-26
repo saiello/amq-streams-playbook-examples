@@ -1,0 +1,28 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - include_role:
+        name: redhat-cop.jboss-common  
+
+
+- hosts: zookeepers
+  become: yes
+  tasks:
+    - include_role:
+        name: amq-streams
+  vars:
+    amq_streams_zookeeper_only: true
+    amq_streams_zookeeper_hosts_group_name: 'zookeepers'
+
+
+- hosts: brokers
+  become: yes
+  tasks:
+    - include_role:
+        name: amq-streams
+  vars:
+    amq_streams_kafka_only: true
+    amq_streams_zookeeper_hosts_group_name: 'zookeepers'
+    amq_streams_kafka_configurations:
+      listeners: 'PLAINTEXT://localhost:9092'

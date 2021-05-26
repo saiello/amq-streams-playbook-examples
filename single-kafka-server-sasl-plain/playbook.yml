@@ -1,0 +1,23 @@
+---
+- hosts: simplehost
+  become: yes
+
+  tasks:
+    - include_role:
+        name: redhat-cop.jboss-common
+    - include_role:
+        name: amq-streams
+
+    - copy: src=configs/jaas.conf dest={{ amq_streams_kafka_config_dir }}/jaas.conf
+
+  vars:
+    transfer_method: csp-to-host
+    rhn_username: "{{ lookup('env', 'RHN_USERNAME') }}"
+    rhn_password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+    amq_streams_kafka_environ:
+      KAFKA_OPTS: -Djava.security.auth.login.config={{ amq_streams_kafka_config_dir }}/jaas.conf
+    amq_streams_kafka_configurations:
+      listeners: 'AUTHENTICATED://localhost:9092'
+      listener.security.protocol.map: 'AUTHENTICATED:SASL_PLAINTEXT'
+      inter.broker.listener.name: 'AUTHENTICATED'
+      sasl.enabled.mechanisms: PLAIN

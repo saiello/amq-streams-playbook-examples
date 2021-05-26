@@ -1,0 +1,15 @@
+---
+- name: Install AMQ Streams
+  hosts: streams
+  become: yes
+  roles:
+    - redhat-cop.jboss-common
+    - amq-streams
+
+  vars:
+    transfer_method: csp-to-host
+    rhn_username: "{{ lookup('env', 'RHN_USERNAME') }}"
+    rhn_password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+
+    amq_streams_kafka_configurations:
+      listeners: 'PLAINTEXT://localhost:9092'

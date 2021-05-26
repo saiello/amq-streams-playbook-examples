@@ -1,0 +1,27 @@
+---
+- hosts: simplehost
+  become: yes
+
+  pre_tasks:
+    - file: name=/etc/certs state=directory
+    - copy: src=certs/kafka.server.keystore.jks dest=/etc/certs
+    - copy: src=certs/kafka.server.truststore.jks dest=/etc/certs
+    - copy: src=certs/kafka.client.truststore.jks dest=/etc/certs
+
+  roles:
+    - redhat-cop.jboss-common
+    - amq-streams
+
+  vars:
+    transfer_method: csp-to-host
+    rhn_username: "{{ lookup('env', 'RHN_USERNAME') }}"
+    rhn_password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+
+    amq_streams_kafka_configurations:
+      listeners: 'SSL://localhost:9092'
+      inter.broker.listener.name: SSL
+      ssl.keystore.location: "/etc/certs/kafka.server.keystore.jks"
+      ssl.keystore.password: changeit
+      ssl.truststore.location: /etc/certs/kafka.server.truststore.jks
+      ssl.truststore.password: changeit
+      ssl.key.password: changeit

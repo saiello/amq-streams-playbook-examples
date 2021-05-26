@@ -1,0 +1,5 @@
+roles:
+  - redhat-cop.jboss-common
+  - sabre1041.redhat-csp-download
+  - git+https://github.com/redhat-cop/jboss_eap,master
+  - git+https://github.com/saiello/amq-streams.git

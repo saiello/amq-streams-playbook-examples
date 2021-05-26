@@ -1,0 +1,23 @@
+---
+- name: Install SSO
+  hosts: sso
+  become: yes
+
+  roles:
+    - redhat-cop.jboss-common
+    - jboss_eap
+
+  vars:
+    transfer_method: csp-to-host
+    rhn_username: "{{ lookup('env', 'RHN_USERNAME') }}"
+    rhn_password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+
+
+    redhat_sso_artifact_source: https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=55951
+    redhat_sso_patch_artifact_source: https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=60781
+    redhat_sso_base_version: 7.2
+    redhat_sso_home_dir_name: rh-sso-{{ redhat_sso_base_version }}
+    redhat_sso_base_directory_name: rh-sso-{{ redhat_sso_base_version }}
+    redhat_sso_artifact_name: "rh-sso-{{ redhat_sso_base_version }}.0.GA"
+    redhat_sso_patch_artifact_name: "rh-sso-7.2.4-patch.zip"
+

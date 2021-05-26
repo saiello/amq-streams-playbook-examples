@@ -1,0 +1,47 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+  
+  N = 6
+  (1..N).each do |machine_id|
+    config.vm.define "machine#{machine_id}" do |machine|
+      machine.vm.hostname = "machine#{machine_id}"
+
+      machine.vm.network "private_network", ip: "192.168.77.#{20+machine_id}"
+
+      # Only execute once the Ansible provisioner,
+      # when all the machines are up and ready.
+      if machine_id == N
+        machine.vm.provision :ansible do |ansible|
+          # Disable default limit to connect to all the machines
+          ansible.limit = "all"
+          ansible.playbook = "playbook.yml"
+
+          ansible.host_vars = {
+            "machine1" => { "amq_streams_zookeeper_id" => 1 },
+            "machine2" => { "amq_streams_zookeeper_id" => 2 },
+            "machine3" => { "amq_streams_zookeeper_id" => 3 },
+            "machine4" => { "amq_streams_kafka_broker_id" => 1 },
+            "machine5" => { "amq_streams_kafka_broker_id" => 2 },
+            "machine6" => { "amq_streams_kafka_broker_id" => 3 },
+          }
+
+          ansible.groups = {
+            "zookeepers" => ["machine[1:3]"],
+            "brokers" => ["machine[4:6]"],
+            "all:vars" => {
+              "transfer_method" => "csp-to-host",
+              "rhn_username" => "{{ lookup('env', 'RHN_USERNAME') }}",
+              "rhn_password" => "{{ lookup('env', 'RHN_PASSWORD') }}"
+            }
+          }
+        end
+      end
+    end
+  end
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+    vb.cpus = 2 
+  end
+
+end

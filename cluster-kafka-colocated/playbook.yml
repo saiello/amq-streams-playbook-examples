@@ -1,0 +1,15 @@
+---
+- hosts: brokers
+  become: yes
+  tasks:
+    - include_role:
+        name: redhat-cop.jboss-common
+    - include_role:
+        name: amq-streams
+  vars:
+    transfer_method: csp-to-host
+    rhn_username: "{{ lookup('env', 'RHN_USERNAME') }}"
+    rhn_password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+
+    amq_streams_kafka_configurations:
+      listeners: 'PLAINTEXT://localhost:9092'
